@@ -17,10 +17,8 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
 const corsOptions = {
-  origin: "https://naukri-search.vercel.app",
+  origin: "https://naukarisearch-2.vercel.app",
   credentials: true,
-  
-
 };
 
 app.use(cors(corsOptions));
