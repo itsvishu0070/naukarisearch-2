@@ -157,7 +157,7 @@ const Profile = () => {
         </div>
 
         {/* Resume */}
-        <div className="grid w-full max-w-sm items-center gap-2">
+        {/* <div className="grid w-full max-w-sm items-center gap-2">
           <Label className="text-md text-white">Resume</Label>
           {isResume ? (
             <a
@@ -167,6 +167,45 @@ const Profile = () => {
               className="text-blue-400 hover:underline truncate max-w-xs"
             >
               {user?.profile?.resumeOriginalName}
+            </a>
+          ) : (
+            <span className="text-gray-400">NA</span>
+          )}
+        </div> */}
+
+        {/* <div className="grid w-full max-w-sm items-center gap-2">
+          <Label className="text-md text-white">Resume</Label>
+          {user?.profile?.resume ? (
+            <a
+              href={user.profile.resume}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:underline truncate max-w-xs"
+            >
+              {user.profile.resumeOriginalName}
+            </a>
+          ) : (
+            <span className="text-gray-400">NA</span>
+          )}
+        </div> */}
+
+        <div className="grid w-full max-w-sm items-center gap-2">
+          <Label className="text-md text-white">Resume</Label>
+          {user?.profile?.resume ? (
+            <a
+              href={user.profile.resume}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:underline truncate max-w-xs"
+              // --- CHANGE THIS LINE ---
+              download={
+                user.profile.resumeOriginalName.endsWith(".pdf")
+                  ? user.profile.resumeOriginalName
+                  : `${user.profile.resumeOriginalName}.pdf`
+              }
+              // -----------------------
+            >
+              {user.profile.resumeOriginalName}
             </a>
           ) : (
             <span className="text-gray-400">NA</span>

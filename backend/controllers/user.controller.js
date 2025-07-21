@@ -121,19 +121,93 @@ export const logout = async (req, res) => {
     console.log(error);
   }
 };
+// export const updateProfile = async (req, res) => {
+//   try {
+//     const { fullname, email, phoneNumber, bio, skills } = req.body;
+
+//     const file = req.file;
+//     // cloudinary ayega idhar
+//     const fileUri = getDataUri(file);
+//     // const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+//     const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+//       folder: "resumes",
+//       resource_type: "raw", // important
+//     });
+
+
+//     let skillsArray;
+//     if (skills) {
+//       skillsArray = skills.split(",");
+//     }
+//     const userId = req.id; // middleware authentication
+//     let user = await User.findById(userId);
+
+//     if (!user) {
+//       return res.status(400).json({
+//         message: "User not found.",
+//         success: false,
+//       });
+//     }
+//     // updating data
+//     if (fullname) user.fullname = fullname;
+//     if (email) user.email = email;
+//     if (phoneNumber) user.phoneNumber = phoneNumber;
+//     if (bio) user.profile.bio = bio;
+//     if (skills) user.profile.skills = skillsArray;
+
+//     // resume comes later here...
+//     if (cloudResponse) {
+//       user.profile.resume = cloudResponse.secure_url; // save the cloudinary url
+//       user.profile.resumeOriginalName = file.originalname; // Save the original file name
+//     }
+
+//     await user.save();
+
+//     user = {
+//       _id: user._id,
+//       fullname: user.fullname,
+//       email: user.email,
+//       phoneNumber: user.phoneNumber,
+//       role: user.role,
+//       profile: user.profile,
+//     };
+
+//     return res.status(200).json({
+//       message: "Profile updated successfully.",
+//       user,
+//       success: true,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 export const updateProfile = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, bio, skills } = req.body;
 
     const file = req.file;
-    // cloudinary ayega idhar
-    const fileUri = getDataUri(file);
-    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+
+    // 🔍 Log to check if file is being received
+    console.log("Uploaded file:", file);
+    console.log("Uploaded file type:", file?.mimetype);
+    console.log("Uploaded file name:", file?.originalname);
+
+    let cloudResponse;
+
+    if (file) {
+      const fileUri = getDataUri(file);
+
+      cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+        folder: "resumes",
+        resource_type: "raw", // important for PDFs, DOCs, etc.
+      }); 
+    }
 
     let skillsArray;
     if (skills) {
       skillsArray = skills.split(",");
     }
+
     const userId = req.id; // middleware authentication
     let user = await User.findById(userId);
 
@@ -143,21 +217,23 @@ export const updateProfile = async (req, res) => {
         success: false,
       });
     }
-    // updating data
+
+    // Update fields
     if (fullname) user.fullname = fullname;
     if (email) user.email = email;
     if (phoneNumber) user.phoneNumber = phoneNumber;
     if (bio) user.profile.bio = bio;
     if (skills) user.profile.skills = skillsArray;
 
-    // resume comes later here...
+    // Resume update (only if cloudinary upload happened)
     if (cloudResponse) {
-      user.profile.resume = cloudResponse.secure_url; // save the cloudinary url
-      user.profile.resumeOriginalName = file.originalname; // Save the original file name
+      user.profile.resume = cloudResponse.secure_url; // Save Cloudinary file URL
+      user.profile.resumeOriginalName = file.originalname; // Save original file name
     }
 
     await user.save();
 
+    // Return only required data
     user = {
       _id: user._id,
       fullname: user.fullname,
@@ -173,6 +249,11 @@ export const updateProfile = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error in updateProfile:", error);
+    return res.status(500).json({
+      message: "Something went wrong.",
+      success: false,
+    });
   }
 };
+
